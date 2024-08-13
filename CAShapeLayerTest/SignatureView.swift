@@ -58,5 +58,14 @@ class SignatureView: UIView {
         lines.removeAll()
         setNeedsDisplay()
     }
+    
+    func asImage() -> UIImage? {
+        UIGraphicsBeginImageContextWithOptions(self.bounds.size, false, 0.0)
+        defer { UIGraphicsEndImageContext() }
+        if let context = UIGraphicsGetCurrentContext() {
+            self.layer.render(in: context)
+        }
+        return UIGraphicsGetImageFromCurrentImageContext()
+    }
 }
 
