@@ -26,7 +26,7 @@ class ViewController: UIViewController {
         let clearButton = UIButton(type: .system)
         clearButton.frame = CGRect(x: 20, y: signatureView.frame.maxY + 20, width: self.view.frame.width / 2 - 30, height: 50)
         clearButton.setTitle("清除簽名", for: .normal)
-        clearButton.backgroundColor = .lightGray
+        clearButton.backgroundColor = .color204BA1
         clearButton.setTitleColor(.white, for: .normal)
         clearButton.layer.cornerRadius = 5
         clearButton.addTarget(self, action: #selector(clearSignature), for: .touchUpInside)
@@ -36,7 +36,7 @@ class ViewController: UIViewController {
         let saveButton = UIButton(type: .system)
         saveButton.frame = CGRect(x: self.view.frame.width / 2 + 10, y: signatureView.frame.maxY + 20, width: self.view.frame.width / 2 - 30, height: 50)
         saveButton.setTitle("儲存簽名", for: .normal)
-        saveButton.backgroundColor = .blue
+        saveButton.backgroundColor = .color3D8B97
         saveButton.setTitleColor(.white, for: .normal)
         saveButton.layer.cornerRadius = 5
         saveButton.addTarget(self, action: #selector(saveSignature), for: .touchUpInside)
