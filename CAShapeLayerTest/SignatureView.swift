@@ -8,57 +8,55 @@
 import UIKit
 
 class SignatureView: UIView {
-
-    var lineColor = UIColor.black       //預設簽名顏色為黑色
-    var lineWidth:CGFloat = 2           //預設簽名寬度為2
-    var path:UIBezierPath?              //紀錄簽名路徑
-    var touchPoint:CGPoint?             //所有簽名座標
-    var startPoint:CGPoint?             //開始簽名座標
+    
+    private var lines: [[CGPoint]] = []
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.backgroundColor = .white
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        self.backgroundColor = .white
+    }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        //開始簽名，將第一個接觸到的座標指定給startPoint
-        startPoint = touches.first?.location(in: self)
-        
+        lines.append([CGPoint]())
     }
-        
+    
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        //正在簽名，將所有簽名時的座標指定給touchPoint
-        touchPoint = touches.first?.location(in: self)
-        //初始化path，在startPoint到touchPoint畫一條線
-        //可以想像成move是開始的座標，addline是下一個的座標
-        //畫完之後再將下一個座標指定成為開始的座標，這樣就能畫出連續的線
-        // startPoint --> touchPoint (startPoint) --> touchPoint (startPoint) --> touchPoint
-        path = UIBezierPath()
-        path?.move(to: startPoint ?? CGPoint.init())
-        path?.addLine(to: touchPoint ?? CGPoint.init())
-        startPoint = touchPoint
-        draw()
+        guard let point = touches.first?.location(in: self), var lastLine = lines.popLast() else {
+            return
+        }
+        lastLine.append(point)
+        lines.append(lastLine)
+        setNeedsDisplay()
     }
     
-    func draw() {
-        let shape = CAShapeLayer()
-        //初始化 CAShapeLayer()
-        shape.path = path?.cgPath
-        //設定 CAShapeLayer要畫出的路徑
-        shape.strokeColor = lineColor.cgColor
-        //設定線條的顏色
-        shape.lineWidth = lineWidth
-        //設定線條的寬度
-        self.layer.addSublayer(shape)
-        //將設定的屬性增加到SignatureView的layer
-        self.setNeedsLayout()
-        //更新畫面
+    override func draw(_ rect: CGRect) {
+        super.draw(rect)
+        
+        guard let context = UIGraphicsGetCurrentContext() else { return }
+        
+        context.setStrokeColor(UIColor.black.cgColor)
+        context.setLineWidth(2)
+        context.setLineCap(.round)
+        
+        lines.forEach { line in
+            guard let firstPoint = line.first else { return }
+            context.beginPath()
+            context.move(to: firstPoint)
+            line.dropFirst().forEach { point in
+                context.addLine(to: point)
+            }
+            context.strokePath()
+        }
     }
     
-    func clearView(){
-        path?.removeAllPoints()
-        //移除UIBezierPath的所有座標
-        
-        self.layer.sublayers = nil
-        //將SignatureView的layer清除
-        
-        self.setNeedsDisplay()
-        //更新畫面
+    func clear() {
+        lines.removeAll()
+        setNeedsDisplay()
     }
 }
 
